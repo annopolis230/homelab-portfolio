@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  nginxproxymanager:
+    image: jlesage/nginx-proxy-manager
+    container_name: NginxProxyManager
+    entrypoint:
+      - /init
+    working_dir: /tmp
+    restart: "no"
+    shm_size: 64mb
+    pids_limit: 2048
+    environment:
+      UMASK: "0000"
+      APP_NICENESS: "0"
+      GROUP_ID: "100"
+      DISABLE_IPV6: "0"
+      USER_ID: "99"
+    volumes:
+      - /mnt/user/appdata/NginxProxyManager:/config:rw
+    ports:
+      - "18443:4443"
+      - "1880:8080"
+      - "7818:8181"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "1"
+        max-size: "50m"
+    networks:
+      proxt_net0:
+        ipv4_address: ${NGINXPROXYMANAGER_CONTAINER_IP}
+
+networks:
+  proxt_net0:
+    external: true

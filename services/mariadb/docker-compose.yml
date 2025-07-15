@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: lscr.io/linuxserver/mariadb
+    container_name: mariadb
+    entrypoint:
+      - /init
+    working_dir: /
+    restart: "no"
+    shm_size: 64mb
+    pids_limit: 2048
+    environment:
+      MYSQL_USER: "${MYSQL_USER}"
+      PGID: "100"
+      UMASK: "022"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    volumes:
+      - /mnt/user/app_data/mariadb:/config:rw
+    ports:
+      - "3306:3306"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "1"
+        max-size: "50m"
+    networks:
+      proxt_net0:
+        ipv4_address: ${MARIADB_CONTAINER_IP}
+
+networks:
+  proxt_net0:
+    external: true

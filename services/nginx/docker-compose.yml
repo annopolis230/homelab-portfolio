@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: lscr.io/linuxserver/nginx
+    container_name: nginx
+    entrypoint:
+      - /init
+    working_dir: /
+    restart: "no"
+    shm_size: 64mb
+    pids_limit: 2048
+    environment:
+      NGINX_AUTORELOAD_WATCHLIST: ""
+      UMASK: "022"
+      NGINX_AUTORELOAD: ""
+      PUID: "99"
+      PGID: "100"
+    volumes:
+      - /mnt/user/appdata/nginx:/config:rw
+    ports:
+      - "14443:443"
+      - "100:80"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "1"
+        max-size: "50m"
+    networks:
+      proxt_net0:
+        ipv4_address: ${NGINX_CONTAINER_IP}
+
+networks:
+  proxt_net0:
+    external: true

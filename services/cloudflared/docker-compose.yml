@@ -1,0 +1,12 @@
+services:
+  proxy:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      proxt_net0:
+        ipv4_address: ${CLOUDFLARED_CONTAINER_IP}
+
+networks:
+  proxt_net0:
+    external: true
