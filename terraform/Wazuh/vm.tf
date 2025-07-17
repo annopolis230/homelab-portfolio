@@ -9,6 +9,7 @@ resource "libvirt_domain" "domain" {
     network_interface {
         bridge = "br0"
         wait_for_lease = true
+        mac = "52:54:00:66:4a:bb"
     }
 
     cpu {
