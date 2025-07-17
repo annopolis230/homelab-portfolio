@@ -1,4 +1,56 @@
-# Terraform Auto-Updater for unRAID
+# Wazuh Terraform Config for unRAID
+
+unRAID has some special considerations that make a Wazuh deployment and Terraform more difficult. Namely, no apt or yum package managers. That's why I'm deploying Wazuh in a VM. There's a couple things we need to do first:
+
+## Requirements
+
+- mkisofs binary installed and located in PATH (again, no apt makes this hard. terraform-setup.py will automatically do this by spinning up a temporary docker container, installing the file, then copying it back to the host)
+- Libvirt needs to be listening on 0.0.0.0 (by default it's not)
+- Terraform installed and in PATH (tested with version 1.12.2)
+
+## Change Libvirt Listening Address
+
+- Edit `/etc/libvirt/libvirtd.conf`
+- Change `listen_addr = "127.0.0.1"` to `listen_addr = "0.0.0.0"`
+
+## Install / Update Terraform
+
+- Run `update-terraform.py`, described below.
+
+## Install mkisofs And Ubuntu Cloud Image
+
+- Run `terraform-setup.py`
+
+### Notes
+
+- This installs a lightweight Ubuntu Cloud Image to `/var/lib/libvirt/images`. This is the directory the Terraform plan looks for the image.
+
+## Install Wazuh Server
+
+1. Generate an SSH keypair:
+   ```bash
+   ssh-keygen -t ed25519 -C "your_email@example.com"
+   ```
+
+2. Add your public key to `cloudinit.cfg` under `ssh_authorized_keys`
+
+3. Run: 
+   ```bash
+   terraform init
+   terraform apply
+   ```
+
+4. (Optional) You may at some point encounter an SSH error stating that the host identification has changed. If that happens, edit the known hosts file and delete the entry that corresponds to the server:
+   ```bash
+   nano /root/.ssh/known_hosts
+   ```
+### Notes
+
+- The newly provisioned server will get a DHCP lease via the br0 bridge interface. If there is no DHCP server serving that interface, provisioning will fail after 5 minutes due to the wait_for_lease timeout.
+- You MUST use your SSH keypair to connect to the server. There is no other way.
+- It also assigns a static MAC for the VM, you can change it to whatever you like in `vm.tf`. I would recommend setting up a DHCP reservation.
+
+# update-terraform.py
 
 This script automatically checks for the latest version of [Terraform](https://www.terraform.io/), compares it with the currently installed version, and downloads and installs it if an update is available.
 
