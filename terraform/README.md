@@ -65,7 +65,7 @@ unRAID has some special considerations that make a Wazuh deployment and Terrafor
 
 2. Check the `wazuh-passwords.txt` file inside `wazuh-install-files.tar`:
    ```bash
-   sudo tar -O -xvf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt
+   sudo tar -O -xvf /wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt
    ```
    This option will display every password for every Wazuh user.
 
