@@ -49,6 +49,7 @@ unRAID has some special considerations that make a Wazuh deployment and Terrafor
 - The newly provisioned server will get a DHCP lease via the br0 bridge interface. If there is no DHCP server serving that interface, provisioning will fail after 5 minutes due to the wait_for_lease timeout.
 - You MUST use your SSH keypair to connect to the server. There is no other way.
 - It also assigns a static MAC for the VM, you can change it to whatever you like in `vm.tf`. I would recommend setting up a DHCP reservation.
+- This installs Wazuh 4.12. To change the version, change the link in the last runcmd command of `cloudinit.cfg`
 
 ### After Deployment
 
