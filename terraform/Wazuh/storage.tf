@@ -24,5 +24,5 @@ resource "libvirt_volume" "ubuntu_vm_disk" {
     name = "wazuh-vm.qcow2"
     pool = libvirt_pool.domains.name
     base_volume_id = libvirt_volume.qcow2.id
-    size = 10737418240
+    size = 107374182400
 }
