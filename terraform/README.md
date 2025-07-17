@@ -23,7 +23,7 @@ unRAID has some special considerations that make a Wazuh deployment and Terrafor
 
 ### Notes
 
-- This installs a lightweight Ubuntu Cloud Image to `/var/lib/libvirt/images`. This is the directory the Terraform plan looks for the image.
+- This downloads a lightweight Ubuntu Cloud Image to `/var/lib/libvirt/images`. This is the directory the Terraform plan looks for the image.
 
 ## Install Wazuh Server
 
@@ -49,6 +49,24 @@ unRAID has some special considerations that make a Wazuh deployment and Terrafor
 - The newly provisioned server will get a DHCP lease via the br0 bridge interface. If there is no DHCP server serving that interface, provisioning will fail after 5 minutes due to the wait_for_lease timeout.
 - You MUST use your SSH keypair to connect to the server. There is no other way.
 - It also assigns a static MAC for the VM, you can change it to whatever you like in `vm.tf`. I would recommend setting up a DHCP reservation.
+
+### After Deployment
+
+- The Wazuh components (server, indexer, and dashboard) will all be installed automatically after deployment. It will take about 5 minutes for these to finish installing.
+- Once the Wazuh components are installed, the web interface will be accessible at `https://<server-ip>:443`. 
+- Use the Admin account to login. You have two options to find the admin password after SSHing to the VM:
+
+1. Check the cloud-init logs:
+   ```bash
+   cat /var/log/cloud-init-output.log
+   ```
+   This is helpful in case anything went wrong, this will tell you why.
+
+2. Check the `wazuh-passwords.txt` file inside `wazuh-install-files.tar`:
+   ```bash
+   sudo tar -O -xvf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt
+   ```
+   This option will display every password for every Wazuh user.
 
 # update-terraform.py
 
