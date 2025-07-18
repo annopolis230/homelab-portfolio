@@ -8,6 +8,8 @@
 2. **Consolidate self‑hosting** — applications I rely on (blog, analytics, game servers) run on hardware I control.  
 3. **Version control** — Git functions as a change‑log.
 
+Read the files in `docs/` for more details!
+
 ## High‑Level Architecture
 
 | Layer | Components | Notes |
