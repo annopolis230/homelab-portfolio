@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  minecraft:
+    container_name: mc-vanilla
+    image: minecraft_docker-minecraft
+    restart: unless-stopped
+    user: minecraft
+    environment:
+      PATH: /opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      JAVA_HOME: /opt/java/openjdk
+      JAVA_VERSION: jdk-21.0.6+7
+      MC_VERSION: 1.21.4
+      MC_DIR: /home/minecraft
+    working_dir: /home/minecraft
+    entrypoint: /entry.sh
+    ports:
+      - "25570:25570"
+    volumes:
+      - /mnt/user/app_data/vanilla:/home/minecraft
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "1"
+    networks:
+      mc_net:
+        ipv4_address: 192.168.2.20
+
+networks:
+  mc_net:
+    external: true
