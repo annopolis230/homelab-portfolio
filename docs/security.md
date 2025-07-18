@@ -34,6 +34,7 @@ Additional segmentation is provided by unRAID’s built‑in bridge firewall rul
 
 | Layer | Mechanism |
 |-------|-----------|
+| **Cloudflare WAF** | Managed rules plus custom firewall policies block known exploits, bots, and geo‑IP ranges before traffic reaches the tunnel. |
 | **TLS Termination** | Cloudflare edge issues and renews certificates; origin communicates via **Origin CA** or valid LE certs. |
 | **Authenticated Origin Pull** | The nginx reverse proxy trusts **only** Cloudflare edge IPs; mutual‑TLS token validates requests. |
 | **Cloudflared Tunnel** | Outbound connector maintains long‑lived tunnel. |
@@ -70,7 +71,8 @@ Alerts feed to a private Discord channel for real‑time triage.
 ## 6. Continuous Improvement Roadmap
 
 1. **Full container log ingestion** into Wazuh with custom decoders for nginx and Authelia.  
+2. **More Robust Firewall Setup** pfSense + VLAN segmentation.
 
 ---
 
-The combination of IAM hardening, segmented networks, authenticated ingress, pervasive TLS, and layered monitoring forms a cohesive defense‑in‑depth posture while embracing zero‑trust assumptions throughout the stack. I wrote more about this on my [blog](https://blog.lightworks.dev/a-defense-in-depth-approach-to-securing-self-hosted-web-infrastructure-without-a-vpn/):
+The combination of IAM hardening, segmented networks, authenticated ingress, pervasive TLS, and layered monitoring forms a cohesive defense‑in‑depth posture while embracing zero‑trust assumptions throughout the stack. I wrote more about this on my [blog](https://blog.lightworks.dev/a-defense-in-depth-approach-to-securing-self-hosted-web-infrastructure-without-a-vpn/).
