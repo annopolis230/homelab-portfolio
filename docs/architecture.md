@@ -69,3 +69,15 @@ nginx‑proxy‑manager          ← only trusts cloudflared’s IP
 
 A [full walkthrough](https://blog.lightworks.dev/securely-access-the-wazuh-dashboard-internally-with-nginx-proxy-manager-and-lets-encrypt/) of this is published on my blog.
 
+## 7. Storage & Data Management
+
+| Layer | Implementation Details |
+|-------|------------------------|
+| **Container Data** | No named Docker volumes are used. Instead, each service bind‑mounts its data directory into the host share **`/mnt/user/app_data/<service>`**. The share is configured as *exclusive* in unRAID, creating a direct symlink to the underlying device and bypassing the FUSE overlay for better performance. |
+| **Cache Strategy** | `app_data` is a **cache‑only** share that lives on the NVMe/SATA cache drive, ensuring low‑latency reads and writes for databases and high‑IO workloads. |
+| **Array Layout** | • 1 × cache drive (SSD)<br>• 2 × 4 TB HDDs in the parity‑protected array. |
+| **Backup Roadmap** | Future automation will rsync or BTRFS‑send snapshots from the `app_data` cache share to the HDD array on a scheduled basis, providing nightly cold copies without re‑introducing FUSE overhead during normal operation. |
+
+This bind‑mount approach simplifies data recovery and removes an extra abstraction layer while still keeping write‑intensive workloads on fast media and protecting long‑term data in the slower parity array.
+
+
