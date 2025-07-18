@@ -14,7 +14,7 @@
 |-------|------------|-------|
 | Hardware | Custom server running unRAID | 32 GB RAM, 8 vCPU, SSD cache pool, HDD array |
 | Virtualization | Docker engine on unRAID + Libvirt/KVM/QEMU VMs | Mostly container based orchestration. A few VMs for experimentation and security monitoring. |
-| Networking | Multiple bridge networks | `proxt_net0`, `mc_net`, `dock_net`, each on separate /24 subnets |
+| Networking | Multiple bridge networks | `proxt_net0`, `mc_net`, `backend_net`, each on separate /24 subnets |
 | Ingress | Cloudflare → cloudflared → nginx‑proxy‑manager | All inbound web traffic originates from Cloudflare tunnels; ports 80/443 are closed on the perimeter |
 | Application Layer | Ghost, Authelia, Portainer, custom Flask API, MariaDB, Redis, Adminer, Minecraft, TeamSpeak | Grouped by use case with least‑privilege firewall rules |
 

@@ -27,9 +27,9 @@ services:
         max-file: "1"
         max-size: "50m"
     networks:
-      proxt_net0:
+      backend_net:
         ipv4_address: ${MARIADB_CONTAINER_IP}
 
 networks:
-  proxt_net0:
+  backend_net:
     external: true

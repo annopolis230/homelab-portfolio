@@ -8,7 +8,7 @@ This document explains the security controls that protect‑in‑depth every l
 
 | Control | Description |
 |---------|-------------|
-| **Authelia SSO** | Central identity provider enforcing TOTP‑based MFA and role‑based policies. All web‑facing services are placed behind Authelia, including administrative paths such as Portainer and nginx‑proxy‑manager dashboards. |
+| **Authelia SSO** | Central identity provider enforcing TOTP‑based MFA and role‑based policies. All web‑facing services are placed behind Authelia, including administrative paths such as Portainer. dashboards. |
 | **Cloudflare Zero Trust** | Additional policy layer that restricts sensitive URLs (e.g., `*/admin`, `*/metrics`) to authenticated Cloudflare users in an allow‑list. |
 | **API Credentials** | The custom Flask API stores encryption‑at‑rest keys in MariaDB using AES‑256; keys are only decrypted in‑memory at runtime. Reverse‑proxy ACLs and rate limiting further constrain access. |
 
@@ -18,16 +18,15 @@ This document explains the security controls that protect‑in‑depth every l
 
 | Zone / Network | Purpose | Ingress Policy |
 |----------------|---------|----------------|
-| `proxy_net` | Externally reachable services | Accepts traffic **only** from the local `cloudflared` connector; upstream firewall blocks inbound 80/443 entirely. |
+| `proxt_net0` | Externally reachable services | Accepts traffic **only** from the local `cloudflared` connector; upstream firewall blocks inbound 80/443 entirely. |
 | `backend_net` | Databases, caches, internal utilities | No direct ingress; reachable exclusively from `proxy_net` containers that require it. |
-| `games_net` | Minecraft and TeamSpeak | Exposed via SRV records and non‑standard ports; limited to game protocols. |
+| `mc_net` | Minecraft and TeamSpeak | Exposed via SRV records and non‑standard ports; limited to game protocols. |
 
 Additional segmentation is provided by unRAID’s built‑in bridge firewall rules, ensuring east‑west traffic is explicit rather than implicit.
 
 **Perimeter Firewall**
 
 * ISP router blocks unsolicited inbound TCP/UDP on 0‑65535.
-* Router isolates IoT VLAN from the homelab’s core networks.
 
 ---
 
@@ -37,7 +36,7 @@ Additional segmentation is provided by unRAID’s built‑in bridge firewall rul
 |-------|-----------|
 | **TLS Termination** | Cloudflare edge issues and renews certificates; origin communicates via **Origin CA** or valid LE certs. |
 | **Authenticated Origin Pull** | The nginx reverse proxy trusts **only** Cloudflare edge IPs; mutual‑TLS token validates requests. |
-| **Cloudflared Tunnel** | Outbound connector maintains long‑lived tunnel; reverse proxy binds to `127.0.0.1:<port>` to eliminate local exposure. |
+| **Cloudflared Tunnel** | Outbound connector maintains long‑lived tunnel. |
 
 ---
 
@@ -47,7 +46,7 @@ Additional segmentation is provided by unRAID’s built‑in bridge firewall rul
 
 * **Rate Limiting** — token‑bucket rules mitigate credential‑stuffing and L7 DoS.
 * **Security Headers** — HSTS, X‑Content‑Type‑Options, X‑Frame‑Options, and CSP are set globally.
-* **Fail2Ban** — monitors 401/403 responses and inserts dynamic block rules.
+* **HSTS** — enforces use of HTTPS.
 
 ### Custom Flask API (High‑Level Notes)
 
@@ -61,10 +60,8 @@ Additional segmentation is provided by unRAID’s built‑in bridge firewall rul
 
 | Component | Function |
 |-----------|----------|
-| **Wazuh Server** | Central SIEM receiving agent telemetry from key LAN devices (unRAID host, primary workstation, pfSense firewall). Rulesets alert on root escalation, container drift, and package manager events. |
+| **Wazuh Server** | Central SIEM receiving agent telemetry from key LAN devices (unRAID host, primary workstation). |
 | **Docker Log Pipeline** | Planned: Vector sidecar → Wazuh JSON input; will provide container stdout/stderr plus nginx access/error logs. |
-| **Uptime Kuma** | External latency checks confirm tunnel and reverse‑proxy availability. |
-| **Grafana Cloud Loki** | Promtail sidecars ship logs to managed Loki instance for search and retention. |
 
 Alerts feed to a private Discord channel for real‑time triage.
 
@@ -73,9 +70,7 @@ Alerts feed to a private Discord channel for real‑time triage.
 ## 6. Continuous Improvement Roadmap
 
 1. **Full container log ingestion** into Wazuh with custom decoders for nginx and Authelia.  
-2. **Trivy GitHub Action** to block pull‑requests introducing images with critical CVEs.  
-3. **Automated DR drills** — Terraform plan to redeploy core services to a cloud VPS for 24‑hour RTO.  
 
 ---
 
-The combination of IAM hardening, segmented networks, authenticated ingress, pervasive TLS, and layered monitoring forms a cohesive defense‑in‑depth posture while embracing zero‑trust assumptions throughout the stack.
+The combination of IAM hardening, segmented networks, authenticated ingress, pervasive TLS, and layered monitoring forms a cohesive defense‑in‑depth posture while embracing zero‑trust assumptions throughout the stack. I wrote more about this on my [blog](https://blog.lightworks.dev/a-defense-in-depth-approach-to-securing-self-hosted-web-infrastructure-without-a-vpn/):
